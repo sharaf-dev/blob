@@ -5,11 +5,12 @@ require 'azure/storage/blob'
 # STRICTLY FOR DEV PURPOSES ONLY.
 #
 # Arguments:
-# 1. Tenant ID (required)
-# 2. Instance ID (required)
+# 1. Storage access key (required)
+# 2. Tenant ID (required)
+# 3. Instance ID (required)
 #
 # Example:
-# delete_start_event_data test-tenant 023df016-7d1a-4fb7-9f6b-dbc52799e3b4
+# delete_start_event_data storage access key test-tenant 023df016-7d1a-4fb7-9f6b-dbc52799e3b4
 
 def guard_env_var(*env_vars)
   env_vars.each do |env_var|
@@ -21,16 +22,17 @@ def guard_args_count(count)
   raise ArgumentError, "Expecting #{count} arguments. #{ARGV.count} given." if count > ARGV.count
 end
 
-guard_env_var('AZURE_STORAGE_ACCOUNT', 'AZURE_STORAGE_ACCESS_KEY')
-guard_args_count(2)
+guard_env_var('AZURE_STORAGE_ACCOUNT')
+guard_args_count(3)
 
-@tenant_id = ARGV[0]
-@instance_id = ARGV[1]
+storage_access_key = ARGV[0]
+@tenant_id = ARGV[1]
+@instance_id = ARGV[2]
 
 @container_name = 'workflow-execution-data'
 @azure_blob_service = Azure::Storage::Blob::BlobService.create(
   storage_account_name: ENV["AZURE_STORAGE_ACCOUNT"],
-  storage_access_key: ENV["AZURE_STORAGE_ACCESS_KEY"]
+  storage_access_key: storage_access_key
 )
 
 
